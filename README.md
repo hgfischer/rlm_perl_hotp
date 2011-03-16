@@ -16,12 +16,8 @@ FreeRadius configuration
 I've included some sample configuration files:
 
 * modules-perl: configuration for the FreeRadius perl module;
-* dictionary: I've added 2 attributes for the script, so they 
-              must be configured in the FreeRadius dictionary;
-* site-hotp: A virtual server configuration that works with 
-             OTP+LDAP. It splits the password in two and 
-             authenticate the first 6 digits as OTP and the 
-             rest as password in LDAP;
+* dictionary: I've added 2 attributes for the script, so they must be configured in the FreeRadius dictionary;
+* site-hotp: A virtual server configuration that works with OTP+LDAP. It splits the password in two and authenticate the first 6 digits as OTP and the rest as password in LDAP;
 
 Populating Redis
 ----------------
