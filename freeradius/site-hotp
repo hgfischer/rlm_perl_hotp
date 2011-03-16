@@ -1,0 +1,72 @@
+# -*- text -*-
+server hotp {
+
+	authorize {
+		preprocess
+		auth_log
+		suffix
+		pap
+		perl
+
+		if (User-Password =~ /^([0-9]{6})(.+)$/) {
+			update request {
+				One-Time-Password := "%{1}"
+				User-Password := "%{2}"
+			}
+		}
+
+		update control {
+			OTP-Window := 1
+			Auth-Type := TwoFactor
+		}
+	}
+
+	authenticate {
+		Auth-Type TwoFactor {
+			perl 
+			ldap
+		}
+
+		perl
+		ldap
+	}
+
+	preacct {
+		preprocess
+		acct_unique
+		suffix
+		perl
+	}
+
+	accounting {
+		detail
+		unix
+		radutmp
+		perl 
+		attr_filter.accounting_response
+	}
+
+	session {
+		radutmp
+		perl
+	}
+
+	post-auth {
+		reply_log
+		ldap
+		perl
+		exec
+
+		Post-Auth-Type REJECT {
+			attr_filter.access_reject
+		}
+	}
+
+	pre-proxy {
+		perl
+	}
+
+	post-proxy {
+		perl
+	}
+}
