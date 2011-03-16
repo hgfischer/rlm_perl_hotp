@@ -60,8 +60,9 @@ sub setup_redis {
 sub setup_keys {
 	&log_sub if DEBUG_SUB;
 	my $username = $RAD_REQUEST{'User-Name'};
-	$KEYS{'offset'} = "{$username}:offset";
-	$KEYS{'secret'} = "{$username}:secret";
+	$KEYS{'offset'} = "$username:offset";
+	$KEYS{'secret'} = "$username:secret";
+	$KEYS{'serial'} = "$username:serial";
 }
 
 # Check if all keys are in Redis
