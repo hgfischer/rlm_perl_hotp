@@ -10,6 +10,10 @@ use Redis;
 # Globals
 use vars qw( %RAD_CONFIG %RAD_REQUEST %RAD_REPLY %RAD_CHECK %KEYS $redis $new_offset );
 
+# Some utility constants
+use constant false => 0;
+use constant true  => 1;
+
 # Some debugging control
 use constant DEBUG_SUB => true;
 use constant DEBUG_REQ => false;
@@ -34,10 +38,6 @@ use constant RLM_MODULE_NOTFOUND => 6; # user not found
 use constant RLM_MODULE_NOOP  => 7; # module succeeded without doing anything 
 use constant RLM_MODULE_UPDATED  => 8; # OK (pairs modified) 
 use constant RLM_MODULE_NUMCODES => 9; # How many return codes there are
-
-# Some utility constants
-use constant false => 0;
-use constant true  => 1;
 
 #############################################################################
 # Internal subs
