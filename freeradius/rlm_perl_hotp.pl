@@ -15,7 +15,7 @@ use constant false => 0;
 use constant true  => 1;
 
 # Some debugging control
-use constant DEBUG_SUB => true;
+use constant DEBUG_SUB => false;
 use constant DEBUG_REQ => false;
 
 # Radlog's constants
@@ -87,11 +87,12 @@ sub check_otp {
 	for (my($i) = -$window; $i <= $window; $i++) {
 		my $pass = hotp($secret, $counter + $i, $digits);
 		if ($pass == $otp) {
-			&radiusd::radlog(L_DBG, "***I*** = $i");
 			$new_offset = $offset + $i;
 			return true;
 		}
 	}
+
+	&radiusd::radlog(L_DBG, "Invalid OTP. Check server's clock, offset sync, and OTP!");
 	return false;
 }
 
@@ -145,6 +146,8 @@ sub authenticate {
 	my $window = int($RAD_CONFIG{'OTP-Window'});
 	my $offset = int($redis->get($KEYS{'offset'}));
 	my $secret = $redis->get($KEYS{'secret'});
+	my $serial = $redis->get($KEYS{'serial'});
+	&radiusd::radlog(L_DBG, "Using offset $offset for token with serial $serial");
 
 	return RLM_MODULE_REJECT unless &check_otp($otp, $offset, $secret, $window);
 	#$redis->set($KEYS{'offset'}, $new_offset);
@@ -177,3 +180,4 @@ sub post_proxy { return RLM_MODULE_NOOP; }
 sub post_auth { return RLM_MODULE_NOOP; }
 # Function to handle xlat
 sub xlat { return RLM_MODULE_NOOP }
+
