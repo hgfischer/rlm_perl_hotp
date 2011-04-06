@@ -15,8 +15,8 @@ use constant false => 0;
 use constant true  => 1;
 
 # Some debugging control
-use constant DEBUG_SUB => false;
-use constant DEBUG_REQ => false;
+use constant DEBUG_SUB => true;
+use constant DEBUG_REQ => true;
 
 # Radlog's constants
 use constant L_DBG => 1;
@@ -150,7 +150,8 @@ sub authenticate {
 	&radiusd::radlog(L_DBG, "Using offset $offset for token with serial $serial");
 
 	return RLM_MODULE_REJECT unless &check_otp($otp, $offset, $secret, $window);
-	#$redis->set($KEYS{'offset'}, $new_offset);
+	# auto sync
+	$redis->set($KEYS{'offset'}, $new_offset);
 	return RLM_MODULE_OK;
 }
 
