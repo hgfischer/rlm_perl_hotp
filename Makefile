@@ -100,6 +100,7 @@ binary:
 	@tar xf dist/$(NAME).tar -C debian/$(NAME)/
 	@dh_installdeb
 	@dh_gencontrol -- -v${VERSION}+${RELEASE}
+	@dh_fixperms
 	@dh_builddeb --destdir dist
 
 build:
