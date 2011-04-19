@@ -1,4 +1,4 @@
-NAME = rlm_perl_hotp
+NAME = rlm-perl-hotp
 SUMMARY = Freeradius HOTP token module
 GROUP = Applications/Tools
 LICENSE = GPLv2
