@@ -16,7 +16,7 @@ server hotp {
 		}
 
 		update control {
-			OTP-Window := 1
+			OTP-Window := 3
 			Auth-Type := TwoFactor
 		}
 	}
