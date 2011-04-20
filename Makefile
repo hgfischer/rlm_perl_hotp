@@ -34,6 +34,7 @@ RELEASE = $(BUILD_STAMP)
 PACKAGER = $(USER)
 PROJROOT = $(shell pwd)
 
+DEPS_DIR = deps
 DIST_DIR = dist
 TAR_DIR = tar
 RPM_DIR = rpm
@@ -116,6 +117,7 @@ clean:
 	@rm -rf $(DIST_DIR)
 	@rm -rf $(RPM_DIR)
 	@rm -rf $(DEBIAN_DIR)
+	@rm -rf $(DEPS_DIR)
 
 $(DIST_DIR):
 	@mkdir -p $(DIST_DIR)
@@ -175,3 +177,11 @@ deb:	tar
 	@echo "7" > $(DEBIAN_DIR)/compat
 	@chmod a+x $(DEBIAN_DIR)/rules
 	@dpkg-buildpackage -us -uc -b --changes-option="-udist"
+	@mkdir $(DEPS_DIR)
+	@cd $(DEPS_DIR); \
+		wget http://search.cpan.org/CPAN/authors/id/I/IW/IWADE/Authen-HOTP-0.02.tar.gz; \
+		tar xvzf Authen-HOTP-0.02.tar.gz
+	@cd $(DEPS_DIR)/Authen-HOTP-0.02/ ; \
+		dh-make-perl; \
+		dpkg-buildpackage -us -uc -b
+	@mv $(DEPS_DIR)/*.deb $(DIST_DIR)/
