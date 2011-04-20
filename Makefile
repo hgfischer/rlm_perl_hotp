@@ -5,7 +5,7 @@ LICENSE = GPLv2
 VENDOR = Herbert G. Fischer <herbert.fischer@gmail.com>
 PREFIX = /
 PYTHON = python2.6
-DEPS = redis-server, freeradius
+DEPS = redis-server, freeradius, libdigest-hmac-perl, libdigest-sha1-perl
 DATE = $(shell date +'%a, %d %b %Y %T %z')
 
 # Get Version from GIT tags with pattern (N.N.N)
