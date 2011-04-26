@@ -144,9 +144,10 @@ sub authenticate {
 	my $otp = $RAD_REQUEST{'One-Time-Password'};
 	return RLM_MODULE_INVALID unless exists $RAD_CONFIG{'OTP-Window'};
 	my $window = int($RAD_CONFIG{'OTP-Window'});
-	my $offset = int($redis->get($KEYS{'offset'}));
-	my $secret = $redis->get($KEYS{'secret'});
-	my $serial = $redis->get($KEYS{'serial'});
+	my @values = $redis->mget($KEYS{'offset'}, $KEYS{'secret'}, $KEYS{'serial'});
+	my $offset = int($values[0]);
+	my $secret = $values[1];
+	my $serial = $values[2];
 	&radiusd::radlog(L_DBG, "Using offset $offset for token with serial $serial");
 
 	return RLM_MODULE_REJECT unless &check_otp($otp, $offset, $secret, $window);
