@@ -39,6 +39,11 @@ use constant RLM_MODULE_NOOP  => 7; # module succeeded without doing anything
 use constant RLM_MODULE_UPDATED  => 8; # OK (pairs modified) 
 use constant RLM_MODULE_NUMCODES => 9; # How many return codes there are
 
+# Default offset window to test against current offset
+use constant OTP_WINDOW => 2;
+# Max difference from original offset that can be accepted for auto-resync
+use constant AR_MAX_OFFSET_DIFF => 5;
+
 #############################################################################
 # Internal subs
 #############################################################################
@@ -63,6 +68,7 @@ sub setup_keys {
 	$KEYS{'offset'} = "$username:offset";
 	$KEYS{'secret'} = "$username:secret";
 	$KEYS{'serial'} = "$username:serial";
+	$KEYS{'original:offset'} = "$username:original:offset";
 }
 
 # Check if all keys are in Redis
@@ -92,7 +98,6 @@ sub check_otp {
 		}
 	}
 
-	&radiusd::radlog(L_DBG, "Invalid OTP. Check server's clock, offset sync, and OTP!");
 	return false;
 }
 
@@ -142,17 +147,34 @@ sub authenticate {
 
 	return RLM_MODULE_INVALID unless exists $RAD_REQUEST{'One-Time-Password'};
 	my $otp = $RAD_REQUEST{'One-Time-Password'};
-	return RLM_MODULE_INVALID unless exists $RAD_CONFIG{'OTP-Window'};
-	my $window = int($RAD_CONFIG{'OTP-Window'});
-	my @values = $redis->mget($KEYS{'offset'}, $KEYS{'secret'}, $KEYS{'serial'});
+
+	#return RLM_MODULE_INVALID unless exists $RAD_CONFIG{'OTP-Window'};
+	#my $window = int($RAD_CONFIG{'OTP-Window'});
+	
+	my @values = $redis->mget($KEYS{'offset'}, $KEYS{'secret'}, $KEYS{'serial'}, $KEYS{'original:offset'});
 	my $offset = int($values[0]);
 	my $secret = $values[1];
 	my $serial = $values[2];
-	&radiusd::radlog(L_DBG, "Using offset $offset for token with serial $serial");
+	my $original_offset = int($values[3]);
 
-	return RLM_MODULE_REJECT unless &check_otp($otp, $offset, $secret, $window);
+	&radiusd::radlog(L_INFO, "Using offset $offset +/-" . OTP_WINDOW  . " for token with serial $serial");
+
+	unless (&check_otp($otp, $offset, $secret, OTP_WINDOW)) {
+		&radiusd::radlog(L_ERR, "Invalid OTP. Trying with original offset.");
+		unless (&check_otp($otp, $original_offset, $secret, OTP_WINDOW)) {
+			&radiusd::radlog(L_ERR, "Invalid OTP. Check server's clock and offset sync!");
+			return RLM_MODULE_REJECT;
+		}
+	}
+
 	# auto sync
-	$redis->set($KEYS{'offset'}, $new_offset);
+	if (abs($original_offset - $new_offset) <= AR_MAX_OFFSET_DIFF) {
+		&radiusd::radlog(L_INFO, "Updating offset for token with serial $serial with value $new_offset");
+		$redis->set($KEYS{'offset'}, $new_offset);
+	} else {
+		&radiusd::radlog(L_ERR, "Cannot auto-resync token $serial with value $new_offset. Difference larger than allowed. Resync token in web admin tool.");
+	}
+
 	return RLM_MODULE_OK;
 }
 
@@ -161,7 +183,7 @@ sub detach {
 	&log_sub if DEBUG_SUB;
 	&log_request if DEBUG_REQ;
 	$redis->quit;
-	return RLM_MODULE_NOOP
+	return RLM_MODULE_NOOP;
 }
 
 #############################################################################

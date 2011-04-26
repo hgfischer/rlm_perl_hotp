@@ -33,6 +33,7 @@ while (my $line = <OTPFILE>) {
 	my $secret = $key ^ $cysecret;
 	print "Registering token '$serial' for '$username'...";
 	$redis->set("$username:offset" => $offset);
+	$redis->set("$username:original:offset" => $offset);
 	$redis->set("$username:secret" => $secret);
 	$redis->set("$username:serial" => $serial);
 	print "done.\n";

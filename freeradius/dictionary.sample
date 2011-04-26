@@ -32,5 +32,4 @@ $INCLUDE	/usr/share/freeradius/dictionary
 #ATTRIBUTE	My-Local-Integer	3002	integer
 #
 # rlm_perl_hotp
-ATTRIBUTE	One-Time-Password	3000	string
-ATTRIBUTE	OTP-Window			3001	integer
+ATTRIBUTE	One-Time-Password			3000	string
