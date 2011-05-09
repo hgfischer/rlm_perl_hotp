@@ -109,6 +109,11 @@ build:
 endef
 export rules
 
+define conffiles
+/etc/freeradius/sites-available/hotp
+endef
+export conffiles
+
 all: 	tar
 
 clean:
@@ -174,10 +179,11 @@ deb:	tar
 	@echo "$$copyright" > $(DEBIAN_DIR)/copyright
 	@echo "$$changelog" > $(DEBIAN_DIR)/changelog
 	@echo "$$rules" > $(DEBIAN_DIR)/rules
+	@echo "$$conffiles" > $(DEBIAN_DIR)/conffiles
 	@echo "7" > $(DEBIAN_DIR)/compat
 	@chmod a+x $(DEBIAN_DIR)/rules
 	@dpkg-buildpackage -us -uc -b --changes-option="-udist"
-	@mkdir $(PROJROOT)/$(DEPS_DIR)
+	@mkdir -p $(PROJROOT)/$(DEPS_DIR)
 	@cd $(PROJROOT)/$(DEPS_DIR); \
 		wget http://search.cpan.org/CPAN/authors/id/I/IW/IWADE/Authen-HOTP-0.02.tar.gz; \
 		tar xvzf Authen-HOTP-0.02.tar.gz
