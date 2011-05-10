@@ -8,10 +8,17 @@ server hotp {
 		pap
 		perl
 
-		if (User-Password =~ /^([0-9]{6})(.+)$/) {
+#		if (User-Password =~ /^([0-9]{6})(.+)$/) {
+#			update request {
+#				One-Time-Password := "%{1}"
+#				User-Password := "%{2}"
+#			}
+#		}
+
+		if (User-Password =~ /^(.+?)([0-9]{6})$/) {
 			update request {
-				One-Time-Password := "%{1}"
-				User-Password := "%{2}"
+				User-Password := "%{1}"
+				One-Time-Password := "%{2}"
 			}
 		}
 
