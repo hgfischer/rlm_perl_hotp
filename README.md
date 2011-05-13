@@ -17,8 +17,9 @@ I've included some sample configuration files:
 
 * perl.sample: configuration for the FreeRadius rlm\_perl module;
 * ldap.sample: configuration for the FreeRadius rlm\_ldap module;
-* dictionary: I've added 2 attributes for the script, so they must 
-              be configured in the FreeRadius dictionary;
+* dictionary.sample: I've added 2 attributes for the script, so 
+                     they must be configured in the FreeRadius 
+                     dictionary;
 * 2factor: A virtual server configuration that works with OTP+LDAP. 
            It splits the password in two and authenticate the last
            6 digits as OTP and the remainings as password in LDAP.
