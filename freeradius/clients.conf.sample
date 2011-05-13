@@ -164,7 +164,7 @@ client localhost {
 	#  item, as in the example below.
 	#
 #	virtual_server = home1
-	virtual_server = hotp
+	virtual_server = 2factor
 
 	#
 	#  A pointer to the "home_server_pool" OR a "home_server"
