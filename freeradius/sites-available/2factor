@@ -1,5 +1,5 @@
 # -*- text -*-
-server hotp {
+server 2factor {
 
 	authorize {
 		preprocess
@@ -7,13 +7,6 @@ server hotp {
 		suffix
 		pap
 		perl
-
-#		if (User-Password =~ /^([0-9]{6})(.+)$/) {
-#			update request {
-#				One-Time-Password := "%{1}"
-#				User-Password := "%{2}"
-#			}
-#		}
 
 		if (User-Password =~ /^(.+?)([0-9]{6})$/) {
 			update request {
@@ -25,16 +18,26 @@ server hotp {
 		update control {
 			Auth-Type := TwoFactor
 		}
+
+		if (ldap_vh-LDAP-Group == "allowed-group-a") {
+			noop
+		}
+		elsif (ldap_vh-LDAP-Group == "allowed-group-b") {
+			noop
+		}
+		else {
+			reject
+		}
 	}
 
 	authenticate {
 		Auth-Type TwoFactor {
 			perl 
-			ldap
+			ldap_vh
 		}
 
 		perl
-		ldap
+		ldap_vh
 	}
 
 	preacct {
@@ -59,7 +62,7 @@ server hotp {
 
 	post-auth {
 		reply_log
-		ldap
+		ldap_vh
 		perl
 		exec
 

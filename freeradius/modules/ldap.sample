@@ -1,0 +1,23 @@
+ldap ldap_vh {
+	server = "ldap.server.com"
+	basedn = "dc=server,dc=com"
+	filter = "(uid=%{%{Stripped-User-Name}:-%{User-Name}})"
+	base_filter = "(objectclass=posixAccount)"
+	groupname_attribute = cn
+	groupmembership_filter = "(&(objectClass=posixGroup)(memberUid=%{User-Name}))"
+	ldap_connections_number = 5
+	timeout = 4
+	timelimit = 3
+	net_timeout = 1
+	tls {
+		start_tls = yes
+		require_cert	= "allow"
+	}
+	dictionary_mapping = ${confdir}/ldap.attrmap
+	edir_account_policy_check = no
+	compare_check_items = yes
+	do_xlat = yes
+	access_attr_used_for_allow = yes
+	chase_referrals = yes
+	ldap_debug = 0x0038 
+}

@@ -110,7 +110,7 @@ endef
 export rules
 
 define conffiles
-/etc/freeradius/sites-available/hotp
+/etc/freeradius/sites-available/2factor
 endef
 export conffiles
 
