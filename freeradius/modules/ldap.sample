@@ -15,7 +15,7 @@ ldap ldap_vh {
 	}
 	dictionary_mapping = ${confdir}/ldap.attrmap
 	edir_account_policy_check = no
-	compare_check_items = yes
+	compare_check_items = no
 	do_xlat = yes
 	access_attr_used_for_allow = yes
 	chase_referrals = yes

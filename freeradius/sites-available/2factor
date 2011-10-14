@@ -6,17 +6,24 @@ server 2factor {
 		auth_log
 		suffix
 		pap
-		perl
 
-		if (User-Password =~ /^(.+?)([0-9]{6})$/) {
+		update control {
+			Auth-Type := TwoFactor
+		}
+
+		if (User-Password =~ /^(.+?)~([0-9]{6})$/) {
 			update request {
 				User-Password := "%{1}"
 				One-Time-Password := "%{2}"
 			}
 		}
 
-		update control {
-			Auth-Type := TwoFactor
+		ldap
+		if (notfound) {
+			update reply {
+				Reply-Message := 'LDAP USER NOT FOUND'
+			}
+			reject
 		}
 
 		if (ldap_vh-LDAP-Group == "allowed-group-a") {

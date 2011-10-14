@@ -76,6 +76,7 @@ sub check_user_in_redis {
 	&log_sub if DEBUG_SUB;
 	for (keys %KEYS) {
 		if (!$redis->exists($KEYS{$_})) {
+			$RAD_REPLY{'Reply-Message'} = 'OTP USER NOT FOUND';
 			&radiusd::radlog(L_ERR, "Could not find key {$KEYS{$_}} in Redis");
 			return false;
 		}
@@ -144,7 +145,6 @@ sub authenticate {
 	&setup_keys;
 	return RLM_MODULE_FAIL unless &setup_redis;
 	return RLM_MODULE_NOTFOUND unless &check_user_in_redis;
-
 	return RLM_MODULE_INVALID unless exists $RAD_REQUEST{'One-Time-Password'};
 	my $otp = $RAD_REQUEST{'One-Time-Password'};
 
@@ -163,6 +163,7 @@ sub authenticate {
 		&radiusd::radlog(L_ERR, "Invalid OTP. Trying with original offset.");
 		unless (&check_otp($otp, $original_offset, $secret, OTP_WINDOW)) {
 			&radiusd::radlog(L_ERR, "Invalid OTP. Check server's clock and offset sync!");
+			$RAD_REPLY{'Reply-Message'} = 'INVALID OTP';
 			return RLM_MODULE_REJECT;
 		}
 	}
